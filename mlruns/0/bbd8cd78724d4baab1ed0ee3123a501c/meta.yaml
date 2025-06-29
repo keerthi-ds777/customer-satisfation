@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/loges/Desktop/python/sample projects/MLOps/customer-segmentaion/mlruns/0/bbd8cd78724d4baab1ed0ee3123a501c/artifacts
+end_time: 1750490643624
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: bbd8cd78724d4baab1ed0ee3123a501c
+run_name: omniscient-fawn-117
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750490643402
+status: 4
+tags: []
+user_id: loges

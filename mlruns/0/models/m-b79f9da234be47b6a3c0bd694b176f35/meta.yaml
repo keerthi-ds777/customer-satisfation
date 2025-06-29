@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/loges/Desktop/python/sample projects/MLOps/customer-segmentaion/mlruns/0/models/m-b79f9da234be47b6a3c0bd694b176f35/artifacts
+creation_timestamp: 1750657093064
+experiment_id: '0'
+last_updated_timestamp: 1750657100599
+model_id: m-b79f9da234be47b6a3c0bd694b176f35
+model_type: null
+name: model
+source_run_id: null
+status: 2
+status_message: null

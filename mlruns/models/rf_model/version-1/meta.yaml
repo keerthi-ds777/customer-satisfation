@@ -1,0 +1,18 @@
+aliases: []
+creation_timestamp: 1750490847773
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1750490847773
+metrics: null
+model_id: m-bad9c971cad64727ae6ef5a7306597f2
+name: rf_model
+params: null
+run_id: 0258148b81374f97ba31a3de0434aa42
+run_link: null
+source: models:/m-bad9c971cad64727ae6ef5a7306597f2
+status: READY
+status_message: null
+storage_location: file:///C:/Users/loges/Desktop/python/sample projects/MLOps/customer-segmentaion/mlruns/0/models/m-bad9c971cad64727ae6ef5a7306597f2/artifacts
+user_id: null
+version: 1

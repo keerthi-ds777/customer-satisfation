@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/loges/Desktop/python/sample projects/MLOps/customer-segmentaion/mlruns/0/1ea979cb1a8f43c4a4979113515aadd2/artifacts
+end_time: 1750657109266
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 1ea979cb1a8f43c4a4979113515aadd2
+run_name: painted-wolf-691
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750657109062
+status: 3
+tags: []
+user_id: loges
