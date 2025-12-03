@@ -1,9 +1,8 @@
 from dotenv import load_dotenv
 import os
-from src.deploy import MLFlowModelDeployerConfig
 from pipeline.deployment_pipeline import DeploymentTriggerConfig
 
-from pipeline.deployment_pipeline import continuous_deployment_pipeline#,inference_pipeline
+from pipeline.deployment_pipeline import continuous_deployment_pipeline,inference_pipeline
 
 import click
 from mlflow.tracking import get_tracking_uri
@@ -15,6 +14,7 @@ load_dotenv()
 import mlflow
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
 mlflow.set_tracking_uri(tracking_uri)
+from src.deploy import MLFlowModelDeployerConfig
 
 
 DEPLOY = "deploy"
@@ -25,7 +25,7 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
 @click.option(
     "--config",
     "-c",
-    type=click.Choice([DEPLOY, PREDICT, DEPLOY_AND_PREDICT]),
+    type=click.Choice([DEPLOY, PREDICT, DEPLOY_AND_PREDICT],case_sensitive=False),
     default=DEPLOY_AND_PREDICT,
     help="Optionally you can choose to only run the deployment "
     "pipeline to train and deploy a model (`deploy`), or to "
@@ -54,7 +54,7 @@ def main(config: str, min_accuracy: float):
 
     if predict:
         # Initialize an inference pipeline run
-       inference_pipeline(
+        inference_pipeline(
             pipeline_name="continuous_deployment_pipeline",
             pipeline_step_name="mlflow_model_deployer_step",
         )

@@ -14,7 +14,7 @@ experiment_tracker = Client().active_stack.experiment_tracker
 
 
 #@step(experiment_tracker=experiment_tracker.name)
-@step(enable_cache=False, experiment_tracker=experiment_tracker.name)
+@step(enable_cache=True, experiment_tracker=experiment_tracker.name)
 def cleaning(DataFrame: pd.DataFrame)-> Tuple[Annotated[np.ndarray,'x_train'],
                                               Annotated[np.ndarray,'x_test'],
                                               Annotated[np.ndarray,'y_train'], 

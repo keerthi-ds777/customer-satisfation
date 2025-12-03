@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, a
 import mlflow
 experiment_tracker = Client().active_stack.experiment_tracker
 
-@step(enable_cache=False, experiment_tracker=experiment_tracker.name)
+@step(enable_cache=True, experiment_tracker=experiment_tracker.name)
 def evaluate_model(y_test, y_pred) -> Tuple[float, float, float, float]:
  
 

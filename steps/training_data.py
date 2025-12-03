@@ -19,7 +19,7 @@ class ModelOutput(NamedTuple):
 
 
 #@step(experiment_tracker=experiment_tracker.name)
-@step(enable_cache=False, experiment_tracker=experiment_tracker.name)
+@step(enable_cache=True, experiment_tracker=experiment_tracker.name)
 def train_model(x_train, x_test, y_train, y_test) -> Tuple[ClassifierMixin, np.ndarray]:
     model_trainer = ModelTrainig(x_train, x_test, y_train, y_test)
     trained_model = model_trainer.fit_model()

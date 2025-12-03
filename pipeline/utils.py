@@ -1,4 +1,4 @@
-'''
+
 
 import logging
 from src.data_cleaning import DataCleaning
@@ -32,4 +32,4 @@ def get_data_for_test():
         
         return result
     except Exception as e:
-        logging.error(e)'''
+        logging.error(e)
