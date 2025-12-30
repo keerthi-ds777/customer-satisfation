@@ -46,7 +46,7 @@ class MlflowDeploymentLoaderStepParameter(BaseModel):
     running: str = True
 
 
-@step(enable_cache=False)
+@step(enable_cache=True)
 def prediction_service_loader(
     pipeline_name: str,
     pipeline_step_name: str,

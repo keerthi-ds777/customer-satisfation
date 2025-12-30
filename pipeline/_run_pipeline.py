@@ -6,7 +6,7 @@ from steps.preprocessing import cleaning
 from steps.training_data import train_model
 from steps.evaluate import evaluate_model
 
-@pipeline(enable_cache=False)
+@pipeline(enable_cache=True)
 def run_pipeline(data_path: str) -> None:
     """
     Run the entire pipeline.

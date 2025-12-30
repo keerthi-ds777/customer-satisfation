@@ -7,6 +7,6 @@ xgboost
 markupsafe
 pandas
 scikit-learn
-zenml
+zenml==0.92.0
 tensorflow
 numpy

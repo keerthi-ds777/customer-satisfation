@@ -8,8 +8,8 @@ import click
 from mlflow.tracking import get_tracking_uri
 from zenml.integrations.mlflow.model_deployers.mlflow_model_deployer import MLFlowModelDeployer
 from typing import cast
-from zenml.integrations.mlflow.services import MLFlowDeploymentService
-from zenml.integrations.mlflow.services import MLFlowDeploymentConfig
+from zenml.integrations.mlflow.services.mlflow_deployment import MLFlowDeploymentService
+from zenml.integrations.mlflow.services.mlflow_deployment import MLFlowDeploymentConfig
 load_dotenv()
 import mlflow
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI")

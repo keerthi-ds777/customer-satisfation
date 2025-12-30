@@ -15,9 +15,9 @@ def evaluate_model(y_test, y_pred) -> Tuple[float, float, float, float]:
     r2 = r2_score(y_test, y_pred)
     mae = mean_absolute_error(y_test, y_pred)
 
-    mlflow.log_metric("accuracy", accuracy)
-    mlflow.log_metric("mse", mse)
-    mlflow.log_metric("rmse", rmse)
+    mlflow.log_metric("accuracy", float(accuracy))
+    mlflow.log_metric("mse", float(mse))
+    mlflow.log_metric("rmse", float(rmse))
     mlflow.log_metric("r2", r2)
     mlflow.log_metric("mae", mae)
 

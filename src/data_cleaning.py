@@ -134,5 +134,5 @@ if __name__ == "__main__":
        df = pd.read_csv('data/olist_customers_dataset.csv',nrows=100)
        x,y = DataCleaning(df).preprocess()
 
-       print(type(x ))
+       print(type(x))
        print(type(y))
