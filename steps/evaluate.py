@@ -3,10 +3,11 @@ from zenml.client import Client
 from typing import Tuple
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, accuracy_score
 import mlflow
+from typing import Annotated
 experiment_tracker = Client().active_stack.experiment_tracker
 
 @step(enable_cache=True, experiment_tracker=experiment_tracker.name)
-def evaluate_model(y_test, y_pred) -> Tuple[float, float, float, float]:
+def evaluate_model(y_test, y_pred) -> Tuple[Annotated[float,'Accuracy'],Annotated[float,'MSE'],Annotated[float,'RMSE'],Annotated[float,'R2'],Annotated[float,'MAE']]:
  
 
     accuracy = accuracy_score(y_test, y_pred)

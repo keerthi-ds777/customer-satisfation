@@ -12,10 +12,10 @@ from zenml.integrations.mlflow.services.mlflow_deployment import MLFlowDeploymen
 from zenml.integrations.mlflow.services.mlflow_deployment import MLFlowDeploymentConfig
 load_dotenv()
 import mlflow
-tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+tracking_uri = os.getenv("MLFLOW_TRACKING_DB")
 mlflow.set_tracking_uri(tracking_uri)
 from src.deploy import MLFlowModelDeployerConfig
-
+ 
 
 DEPLOY = "deploy"
 PREDICT = "predict"
@@ -36,9 +36,15 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
 @click.option(
     "--min-accuracy",
     default=0.8,
-    help="Minimum accuracy required to deploy the model")
+    help="Minimum accuracy required to deploy the model"
+)
+@click.option(
+    "--model-version",
+    default=None,
+    help="Specific version of the model to use for prediction"
+)
 
-def main(config: str, min_accuracy: float):
+def main(config: str, min_accuracy: float, model_version: str):
     """Run the MLflow example pipeline."""
     # get the MLflow model deployer stack component
     mlflow_model_deployer_component = MLFlowModelDeployer.get_active_model_deployer()
@@ -57,11 +63,12 @@ def main(config: str, min_accuracy: float):
         inference_pipeline(
             pipeline_name="continuous_deployment_pipeline",
             pipeline_step_name="mlflow_model_deployer_step",
+            model_version=model_version
         )
 
     print(
         "You can run:\n "
-        f"[italic green]    mlflow ui --backend-store-uri '{get_tracking_uri()}"
+        f"[italic green]    mlflow ui --backend-store-uri {get_tracking_uri()}"
         "[/italic green]\n ...to inspect your experiment runs within the MLflow"
         " UI.\nYou can find your runs tracked within the "
         "`mlflow_example_pipeline` experiment. There you'll also be able to "
@@ -73,6 +80,7 @@ def main(config: str, min_accuracy: float):
         pipeline_name="continuous_deployment_pipeline",
         pipeline_step_name="mlflow_model_deployer_step",
         model_name="model",
+        model_version=model_version,
     )
 
     if existing_services:

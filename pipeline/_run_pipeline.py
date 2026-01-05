@@ -1,3 +1,4 @@
+from steps.evaluate import experiment_tracker
 import logging
 from zenml import pipeline
 from steps.ingest_data import ingesting
@@ -5,8 +6,9 @@ from src.data_cleaning import DataCleaning, ModelTrainig
 from steps.preprocessing import cleaning
 from steps.training_data import train_model
 from steps.evaluate import evaluate_model
-
-@pipeline(enable_cache=True)
+from zenml.client import Client
+experiment_tracker=Client().active_stack.experiment_tracker
+@pipeline(enable_cache=True,experiment_tracker=experiment_tracker.name)
 def run_pipeline(data_path: str) -> None:
     """
     Run the entire pipeline.

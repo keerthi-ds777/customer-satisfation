@@ -101,21 +101,24 @@ class ModelTrainig:
         self.y_pred=None
         info("ModelTraining class initialized")
     
-    def fit_model(self)->None:
+    def fit_model(self,registerd_model=False,model_name="rf_model",model_version="1")->Annotated[object,'MlModel']:
         """train the model by only using pre-trained models in pkl files"""
-        
-        from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error,accuracy_score
-        import joblib
+        if registerd_model==False:
+            from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error,accuracy_score
+            import joblib
 
-        model = joblib.load('saved_model/model2.pkl')        
-        model.fit(self.x_train, self.y_train)
-        info("Model trained successfully")
-        
-        # predicting the test set
-        self.y_pred = model.predict(self.x_test)
+            model = joblib.load('saved_model/model2.pkl')        
+            model.fit(self.x_train, self.y_train)
+            info("Model trained successfully")
+            
+            # predicting the test set
+            self.y_pred = model.predict(self.x_test)
 
-        return model
-    
+            return model
+        else:
+            import mlflow
+            model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{model_version}")   
+            return model
     
     def evaluate_model(self,y_test,y_pred)->None:
         # evaluating the model

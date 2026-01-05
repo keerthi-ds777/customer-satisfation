@@ -25,6 +25,7 @@ def get_data_for_test():
         "product_length_cm",
         "product_height_cm",
         "product_width_cm",
+        "review_score"
     ]]
         df = df.sample(n=100)
         x,y = DataCleaning(df).preprocess()

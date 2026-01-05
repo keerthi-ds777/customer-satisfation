@@ -1,11 +1,18 @@
 import sys
 import pytest
+import logging
 from unittest.mock import MagicMock, patch
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def test_run_pipeline_logic():
     """
     Unit test for run_pipeline logic bypassing ZenML orchestration.
     """
+    logger.info("Starting test_run_pipeline_logic")
+
     # Create a mock for zenml module
     mock_zenml = MagicMock()
     
@@ -17,6 +24,8 @@ def test_run_pipeline_logic():
         return decorator
     
     mock_zenml.pipeline.side_effect = pipeline_wrapper
+
+    logger.info("Mocking 'zenml' module and '@pipeline' decorator")
 
     # Patch 'zenml' in sys.modules so the import in _run_pipeline uses our mock
     with patch.dict(sys.modules, {'zenml': mock_zenml}):
@@ -31,6 +40,8 @@ def test_run_pipeline_logic():
         
         # Let's mock the steps modules to avoid importing them (and their deps like tensorflow)
         mock_steps = MagicMock()
+
+        logger.info("Mocking 'steps' and 'src' modules to isolate logic")
         with patch.dict(sys.modules, {
             'steps': mock_steps,
             'steps.ingest_data': mock_steps.ingest_data,
@@ -63,10 +74,17 @@ def test_run_pipeline_logic():
             
             # Act
             # Because of our zenml mock, run_pipeline is just the plain function now
+            logger.info("Calling _run_pipeline.run_pipeline")
             _run_pipeline.run_pipeline("data/dummy.csv")
             
             # Assert
+            logger.info("Verifying mock calls")
             mock_ingesting.assert_called_once_with(data_path="data/dummy.csv")
             mock_cleaning.assert_called_once_with(mock_data)
             mock_train.assert_called_once_with("xtrain", "xtest", "ytrain", "ytest")
             mock_evaluate.assert_called_once_with("ytest", "pred")
+            
+    logger.info("test_run_pipeline_logic completed successfully")
+
+if __name__ == "__main__":
+    test_run_pipeline_logic()
