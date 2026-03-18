@@ -4,24 +4,24 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from PIL import Image
-from pipelines.deployment_pipeline import prediction_service_loader
+from pipeline.deployment_pipeline import prediction_service_loader
 from deployment_run import main
 
 
 def main():
     st.title("End to End Customer Satisfaction Pipeline with ZenML")
 
-    high_level_image = Image.open("_assets/high_level_overview.png")
-    st.image(high_level_image, caption="High Level Pipeline")
+    #high_level_image = Image.open("_assets/high_level_overview.png")
+    #st.image(high_level_image, caption="High Level Pipeline")
 
-    whole_pipeline_image = Image.open("_assets/training_and_deployment_pipeline_updated.png")
+    #whole_pipeline_image = Image.open("_assets/training_and_deployment_pipeline_updated.png")
 
     st.markdown(
         """ 
     #### Problem Statement 
      The objective here is to predict the customer satisfaction score for a given order based on features like order status, price, payment, etc. I will be using [ZenML](https://zenml.io/) to build a production-ready pipeline to predict the customer satisfaction score for the next order or purchase.    """
     )
-    st.image(whole_pipeline_image, caption="Whole Pipeline")
+    #st.image(whole_pipeline_image, caption="Whole Pipeline")
     st.markdown(
         """ 
     Above is a figure of the whole pipeline, we first ingest the data, clean it, train the model, and evaluate the model, and if data source changes or any hyperparameter values changes, deployment will be triggered, and (re) trains the model and if the model meets minimum accuracy requirement, the model will be deployed.
@@ -91,6 +91,9 @@ def main():
         )
         json_list = json.loads(json.dumps(list(df.T.to_dict().values())))
         data = np.array(json_list)
+        
+        # Start the service before making predictions (required on Windows)
+        service.start(timeout=60)
         pred = service.predict(data)
         st.success(
             "Your Customer Satisfactory rate(range between 0 - 5) with given product details is :-{}".format(
@@ -114,8 +117,8 @@ def main():
         st.write(
             "Following figure shows how important each feature is in the model that contributes to the target variable or contributes in predicting customer satisfaction rate."
         )
-        image = Image.open("_assets/feature_importance_gain.png")
-        st.image(image, caption="Feature Importance Gain")
+        #image = Image.open("_assets/feature_importance_gain.png")
+        #st.image(image, caption="Feature Importance Gain")
 
 
 if __name__ == "__main__":

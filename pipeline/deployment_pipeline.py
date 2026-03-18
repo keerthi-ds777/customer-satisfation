@@ -15,83 +15,13 @@ from src.deploy import MLFlowModelDeployerConfig
 from zenml.integrations.mlflow.steps import mlflow_model_deployer_step
 from zenml.config import DockerSettings
 import logging
-from pipeline.utils import get_data_for_test
-from src.data_cleaning import ModelTrainig
+from pipeline.utils import deployment_trigger_config, dynamic_importer, prediction_service_loader
+from pipeline.utils import MlflowDeploymentLoaderStepParameter, DeploymentTriggerConfig
+from zenml.constants import DEFAULT_SERVICE_START_STOP_TIMEOUT
 docker_settings = DockerSettings(required_integrations=[MLFLOW])
-class DeploymentTriggerConfig(BaseModel):
-    min_accuracy: float = 0.5
-
-@step
-def deployment_trigger_config(accuracy: float,
-                              config: DeploymentTriggerConfig
-) -> bool:
-    """
-    Step to configure deployment trigger settings.
-
-    Args:
-        deployment_trigger_config (DeploymentTriggerConfig): Configuration for deployment triggers.
-
-    Returns:
-        DeploymentTriggerConfig: The same configuration passed in.
 
 
-    """
-    return config.min_accuracy <= accuracy
 
-from zenml.integrations.mlflow.model_deployers.mlflow_model_deployer import MLFlowModelDeployer
-
-class MlflowDeploymentLoaderStepParameter(BaseModel):
-    pipeline_name: str
-    step_name: str
-    running: str = True
-
-
-@step(enable_cache=True)
-def prediction_service_loader(
-    pipeline_name: str,
-    pipeline_step_name: str,
-    running: bool = True,
-    model_name: str = "model",
-    model_version: str = None,
-) -> MLFlowDeploymentService:
-    """Get the prediction service started by the deployment pipeline.
-
-    Args:
-        pipeline_name: name of the pipeline that deployed the MLflow prediction
-            server
-        step_name: the name of the step that deployed the MLflow prediction
-            server
-        running: when this flag is set, the step only returns a running service
-        model_name: the name of the model that is deployed
-        model_version: the version of the model to be deployed
-    """
-    # get the MLflow model deployer stack component
-    model_deployer = MLFlowModelDeployer.get_active_model_deployer()
-
-    # fetch existing services with same pipeline name, step name and model name
-    existing_services = model_deployer.find_model_server(
-        pipeline_name=pipeline_name,
-        pipeline_step_name=pipeline_step_name,
-        model_name=model_name,
-        model_version=model_version,
-        running=running,
-    )
-
-    if not existing_services:
-        raise RuntimeError(
-            f"No MLflow prediction service deployed by the "
-            f"{pipeline_step_name} step in the {pipeline_name} "
-            f"pipeline for the '{model_name}' model is currently "
-            f"running."
-        )
-    print(existing_services)
-    print(type(existing_services))
-    return existing_services[0]
-
-@step(enable_cache=False)
-def dynamic_importer() -> str:
-    data = get_data_for_test()
-    return data
 
 @step
 def predictor(
@@ -127,25 +57,35 @@ def predictor(
 
 
 @pipeline(enable_cache=True, settings={'docker': docker_settings})
-def continuous_deployment_pipeline(deploymentconfig: DeploymentTriggerConfig,
-                                   mlflow_model_deployer_config: MLFlowModelDeployerConfig,
-                                   model_name:str="rf_model",
-                                   model_version:str) -> None:
-    # Ingest data
+def continuous_deployment_pipeline(
+    min_accuracy: float = 0.5,
+    workers: int = 1,
+    timeout: int = DEFAULT_SERVICE_START_STOP_TIMEOUT,
+    model_name:str="rf_model",
+    model_version:str="1"
+) -> None:
+    
+    deploymentconfig = DeploymentTriggerConfig(min_accuracy=min_accuracy)
+    mlflow_model_deployer_config = MLFlowModelDeployerConfig(workers=workers, timeout=timeout)
+
     data = ingesting(data_path="data/olist_customers_dataset.csv")
     
     # Clean data
     #preprocessing the data
     x_train, x_test, y_train, y_test = cleaning(data)  
+    model, y_pred = train_model(
+        x_train=x_train,
+        x_test=x_test,
+        y_train=y_train,
+        y_test=y_test,
+        registerd_model=True,
+        model_name=model_name,
+        model_version=model_version
+    )
     
-    # Train model
     
-
-    model_training=ModelTrainig(x_train, x_test, y_train, y_test)
-    model = model_training.fit_model(registerd_model=True,model_name=model_name,model_version=model_version) #train the model
-    y_pred = model.predict(x_test)
     # Evaluate model
-    accuracy, mse, r2, mae=evaluate_model(y_test,y_pred)
+    accuracy, mse, r2, mae = evaluate_model(y_test, y_pred)
     logging.info(f"Model Accuracy: {accuracy}")
     logging.info(f"Model MSE: {mse}")
     logging.info(f"Model R2: {r2}")

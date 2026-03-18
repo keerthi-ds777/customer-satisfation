@@ -38,9 +38,20 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
     default=0.8,
     help="Minimum accuracy required to deploy the model"
 )
+@click.option(
+    "--model-version",
+    default=None,
+    help="Specific version of the model to use for prediction"
+)
+
+@click.option(
+    "--model-name",
+    default="rf_model",
+    help="Name of the model to use for prediction"
+)
 
 
-def main(config: str, min_accuracy: float, model_version: str):
+def main(config: str, min_accuracy: float,model_version: str,model_name: str):
     """Run the MLflow example pipeline."""
     # get the MLflow model deployer stack component
     mlflow_model_deployer_component = MLFlowModelDeployer.get_active_model_deployer()
@@ -48,18 +59,23 @@ def main(config: str, min_accuracy: float, model_version: str):
     predict = config == PREDICT or config == DEPLOY_AND_PREDICT
 
     if deploy:
+        if model_version is None:
+            model_version = "1"
         # Initialize a continuous deployment pipeline run
         continuous_deployment_pipeline(
-            deploymentconfig=DeploymentTriggerConfig(min_accuracy=min_accuracy),
-            mlflow_model_deployer_config=MLFlowModelDeployerConfig()
+    
+            min_accuracy=min_accuracy,
+            workers=1,
+            timeout=300,
+            model_version=model_version,
+            model_name=model_name
         )
 
     if predict:
         # Initialize an inference pipeline run
         inference_pipeline(
             pipeline_name="continuous_deployment_pipeline",
-            pipeline_step_name="mlflow_model_deployer_step",
-            model_version=model_version
+            pipeline_step_name="mlflow_model_deployer_step"
         )
 
     print(
@@ -75,9 +91,8 @@ def main(config: str, min_accuracy: float, model_version: str):
     existing_services = mlflow_model_deployer_component.find_model_server(
         pipeline_name="continuous_deployment_pipeline",
         pipeline_step_name="mlflow_model_deployer_step",
-        model_name="model",
-        model_version=model_version,
-    )
+        model_name="rf_model"
+       )
 
     if existing_services:
         service = cast(MLFlowDeploymentService, existing_services[0])

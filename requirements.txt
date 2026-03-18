@@ -17,7 +17,7 @@ cloudpickle==3.1.2
 colorama==0.4.6
 comm==0.2.2
 contourpy==1.2.1
-cupy-cuda11x==13.3.0
+# cupy-cuda11x==13.3.0  # Removed: CUDA-specific, install separately if needed
 cycler==0.12.1
 DateTime==5.5
 debugpy==1.8.2
@@ -112,7 +112,7 @@ pytest==8.4.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 pytz==2024.1
-pywin32==306
+# pywin32  # Removed: Windows-only package
 PyYAML==6.0.3
 pyzmq==26.0.3
 referencing==0.35.1
@@ -139,7 +139,7 @@ tenacity==8.5.0
 tensorboard==2.17.1
 tensorboard-data-server==0.7.2
 tensorflow==2.17.0
-tensorflow-intel==2.17.0
+# tensorflow-intel==2.17.0  # Removed: Windows/Intel specific
 termcolor==2.4.0
 threadpoolctl==3.5.0
 toml==0.10.2
@@ -167,3 +167,4 @@ xyzservices==2025.1.0
 yfinance==0.2.40
 zenml==0.91.2
 zope.interface==6.4.post2
+pip install zenml["server"]

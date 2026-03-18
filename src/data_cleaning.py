@@ -101,24 +101,40 @@ class ModelTrainig:
         self.y_pred=None
         info("ModelTraining class initialized")
     
-    def fit_model(self,registerd_model=False,model_name="rf_model",model_version="1")->Annotated[object,'MlModel']:
+    def fit_model(self,registerd_model=False,model_name:str="rf_model",model_version:str="1")->Tuple[
+    Annotated[object, 'MlModel'], 
+    Annotated[np.ndarray, 'predictions']
+]:
         """train the model by only using pre-trained models in pkl files"""
         if registerd_model==False:
             from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error,accuracy_score
             import joblib
 
-            model = joblib.load('saved_model/model2.pkl')        
+            model = joblib.load('models/model2.pkl')        
             model.fit(self.x_train, self.y_train)
             info("Model trained successfully")
             
             # predicting the test set
             self.y_pred = model.predict(self.x_test)
 
-            return model
+            return model,self.y_pred
         else:
             import mlflow
-            model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{model_version}")   
-            return model
+            from zenml.client import Client
+            from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error,accuracy_score
+            experiment_tracker = Client().active_stack.experiment_tracker
+            tracker=experiment_tracker.get_tracking_uri()
+            mlflow.set_tracking_uri(f'{tracker}')
+            model = mlflow.pyfunc.load_model(
+                model_uri=f"models:/{model_name}/{model_version}"
+            ).get_raw_model()
+            model.fit(self.x_train, self.y_train)
+            info("Model trained successfully")
+            
+            # predicting the test set
+            self.y_pred = model.predict(self.x_test)
+
+            return model,self.y_pred
     
     def evaluate_model(self,y_test,y_pred)->None:
         # evaluating the model

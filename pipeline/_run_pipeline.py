@@ -7,8 +7,13 @@ from steps.preprocessing import cleaning
 from steps.training_data import train_model
 from steps.evaluate import evaluate_model
 from zenml.client import Client
-experiment_tracker=Client().active_stack.experiment_tracker
-@pipeline(enable_cache=True,experiment_tracker=experiment_tracker.name)
+from zenml.config import DockerSettings
+from zenml.integrations.constants import MLFLOW
+
+docker_settings = DockerSettings(required_integrations=[MLFLOW])
+
+
+@pipeline(enable_cache=False, settings={"docker": docker_settings})
 def run_pipeline(data_path: str) -> None:
     """
     Run the entire pipeline.
@@ -27,8 +32,9 @@ def run_pipeline(data_path: str) -> None:
     model,y_pred=train_model(x_train, x_test, y_train, y_test) #train the model
     
     # Evaluate model
-    accuracy, mse, r2, mae=evaluate_model(y_test,y_pred)
+    accuracy, mse, rmse, r2, mae=evaluate_model(y_test,y_pred)
     logging.info(f"Model Accuracy: {accuracy}")
     logging.info(f"Model MSE: {mse}")
+    logging.info(f"Model RMSE: {rmse}")
     logging.info(f"Model R2: {r2}")
     logging.info(f"Model MAE: {mae}")

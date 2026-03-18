@@ -1,7 +1,8 @@
 from zenml import step
 import pandas as pd
 import logging
-from src.data_cleaning import DataCleaning, ModelTrainig
+from src.data_cleaning import DataCleaning
+from src.model_training import ModelTrainig
 from zenml.client import Client
 from typing import NamedTuple
 import numpy as np
@@ -12,18 +13,28 @@ from typing import Tuple
 import numpy as np
 
 
-class ModelOutput(NamedTuple):
-    model: object  # e.g., sklearn.base.BaseEstimator
-    y_pred: np.ndarray
+ 
 
 
 #@step(experiment_tracker=experiment_tracker.name)
 @step(enable_cache=True, experiment_tracker=experiment_tracker.name)
-def train_model(x_train, x_test, y_train, y_test) -> Tuple[ClassifierMixin, np.ndarray]:
+def train_model(
+    x_train: np.ndarray,
+    x_test: np.ndarray,
+    y_train: np.ndarray,
+    y_test: np.ndarray,
+    registerd_model: bool = False,
+    model_name: str = "rf_model",
+    model_version: str = "1",
+    log_model: bool = False,
+) -> Tuple[ClassifierMixin, np.ndarray]:
     model_trainer = ModelTrainig(x_train, x_test, y_train, y_test)
-    trained_model = model_trainer.fit_model()
-    
-    y_pred = trained_model.predict(x_test)
+    trained_model, y_pred = model_trainer.fit_model(
+        registerd_model=registerd_model,
+        model_name=model_name,
+        model_version=model_version,
+        log_model=log_model
+    )
 
     # Log model parameters
     try:
@@ -32,16 +43,13 @@ def train_model(x_train, x_test, y_train, y_test) -> Tuple[ClassifierMixin, np.n
     except Exception as e:
         logging.warning(f"Could not log parameters: {e}")
 
-        # ✅ Automatically logs the model AND registers it
-    mlflow.sklearn.log_model(trained_model, name="model", registered_model_name="rf_model")
-
     return trained_model, y_pred
     
 if __name__ == "__main__":
     data = pd.read_csv("data/olist_customers_dataset.csv")
     data_cleaning = DataCleaning(data)
     x, y = data_cleaning.preprocess()
-    model = train_model(x, x, y, y)
+    model = train_model(x,y)
     print(model)
 
     print(model.y_pred)
