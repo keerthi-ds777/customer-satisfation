@@ -38,11 +38,7 @@ DEPLOY_AND_PREDICT = "deploy_and_predict"
     default=0.8,
     help="Minimum accuracy required to deploy the model"
 )
-@click.option(
-    "--model-version",
-    default=None,
-    help="Specific version of the model to use for prediction"
-)
+
 
 def main(config: str, min_accuracy: float, model_version: str):
     """Run the MLflow example pipeline."""
